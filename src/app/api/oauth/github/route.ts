@@ -8,7 +8,6 @@ import { github } from '@/lib/oauth'
 import { lucia } from '@/lib/lucia'
 import { oauthAccountTable, userTable } from '@/db/schema'
 import { db } from '@/db'
-import { BASE_URL } from '@/utils/base-url'
 
 interface GithubUser {
   id: string
@@ -102,7 +101,7 @@ export async function GET(req: Request) {
         }
       }
 
-      return NextResponse.redirect(new URL('/', BASE_URL), {
+      return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_SERVER_URL), {
         status: 302,
       })
     })
@@ -119,7 +118,7 @@ export async function GET(req: Request) {
       expires: new Date(0),
     })
 
-    return NextResponse.redirect(new URL('/', BASE_URL), {
+    return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_SERVER_URL), {
       status: 302,
     })
   } catch (error: unknown) {
