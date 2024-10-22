@@ -34,7 +34,6 @@ export default function ApplyFilter({
     try {
       const newUrl = await applyFilterToImage(uploadedImageUrl, filterValue)
 
-      console.log(newUrl)
       updateUploadedImageUrl(newUrl)
     } catch (error) {
       console.log(error)
