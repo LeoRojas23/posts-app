@@ -2,6 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 
 import { Inter } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/react'
 
 import { cn } from '@/utils/cn'
 import ToastProvider from '@/components/toast-provider'
@@ -24,6 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang='en'>
       <body className={cn('mx-auto h-full w-full lg:max-w-5xl', inter.className)}>
         <FollowProvider followPromise={followData}>
+          <Analytics />
           <ToastProvider />
           <Nav />
           {children}
