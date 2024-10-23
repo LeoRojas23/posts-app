@@ -62,9 +62,6 @@ export default function ApplyFilter({
               <option className='text-sm font-medium' value='default'>
                 Choose a filter
               </option>
-              {/* <option disabled hidden className='text-sm font-medium' value=''>
-                Choose a filter
-              </option> */}
               {filterOptions.map(option => (
                 <option key={option.value} className='text-sm font-medium' value={option.value}>
                   {option.label}
