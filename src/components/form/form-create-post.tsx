@@ -18,9 +18,10 @@ import { STEPS_FORM_CREATE_POST } from '@/utils/utils'
 export default function FormCreatePost({ session }: { session: SessionAuth | null }) {
   const [currentStep, setCurrentStep] = useState<
     (typeof STEPS_FORM_CREATE_POST)[keyof typeof STEPS_FORM_CREATE_POST]
-  >(STEPS_FORM_CREATE_POST.TEXT)
+  >(STEPS_FORM_CREATE_POST.START)
   const [file, setFile] = useState<FileWithPreview | null>(null)
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null)
+  const [uploadedImageFilteredUrl, setUploadedImageFilteredUrl] = useState<string | null>(null)
   const [isImageLoading, setIsImageLoading] = useState(true)
   const ref = useRef<HTMLFormElement>(null)
 
@@ -58,12 +59,14 @@ export default function FormCreatePost({ session }: { session: SessionAuth | nul
       return
     }
 
-    const result = await createPost(formData, uploadedImageUrl)
+    const imageUrlToUse = uploadedImageFilteredUrl ?? uploadedImageUrl
+
+    const result = await createPost(formData, imageUrlToUse)
 
     ref.current?.reset()
     setFile(null)
     setUploadedImageUrl(null)
-    setCurrentStep(STEPS_FORM_CREATE_POST.TEXT)
+    setCurrentStep(STEPS_FORM_CREATE_POST.START)
 
     if (result?.error) {
       toast.error(result.error)
@@ -76,8 +79,14 @@ export default function FormCreatePost({ session }: { session: SessionAuth | nul
     setIsImageLoading(value)
   }
 
-  const updateUploadedImageUrl = (value: string) => {
-    setUploadedImageUrl(value)
+  const updateCurrentStep = (
+    value: (typeof STEPS_FORM_CREATE_POST)[keyof typeof STEPS_FORM_CREATE_POST],
+  ) => {
+    setCurrentStep(value)
+  }
+
+  const updateUploadedImageFilteredUrl = (value: string) => {
+    setUploadedImageFilteredUrl(value)
   }
 
   return (
@@ -126,10 +135,10 @@ export default function FormCreatePost({ session }: { session: SessionAuth | nul
             }}
             onClose={() => {
               setFile(null)
-              setCurrentStep(STEPS_FORM_CREATE_POST.TEXT)
+              setCurrentStep(STEPS_FORM_CREATE_POST.START)
             }}
           />
-        ) : uploadedImageUrl && currentStep !== STEPS_FORM_CREATE_POST.CROP ? (
+        ) : uploadedImageFilteredUrl ? (
           <div className='relative flex h-[480px] w-full items-center justify-center'>
             <img
               alt={file?.name}
@@ -137,21 +146,48 @@ export default function FormCreatePost({ session }: { session: SessionAuth | nul
                 'animate-pulse opacity-10 blur-sm': isImageLoading,
                 'opacity-100': !isImageLoading,
               })}
-              src={uploadedImageUrl}
+              src={uploadedImageFilteredUrl}
               onError={() => {
-                toast.error('Error while loading image, try again')
+                toast.error('Error while loading filtered image, try again')
                 setIsImageLoading(false)
+                setCurrentStep(STEPS_FORM_CREATE_POST.START)
+                setFile(null)
+                setUploadedImageFilteredUrl(null)
+                setUploadedImageUrl(null)
               }}
-              onLoad={() => setIsImageLoading(false)}
+              onLoad={() => {
+                setIsImageLoading(false)
+                setCurrentStep(STEPS_FORM_CREATE_POST.COMPLETED)
+              }}
             />
 
             <button
               className='animate-fadeIn absolute left-1 top-1 rounded-full border-2 border-[#a50f0f] bg-[#26262690] p-1 transition-opacity duration-100 ease-linear hover:opacity-80 sm:p-1.5'
               type='button'
               onClick={() => {
-                setUploadedImageUrl(null)
+                setCurrentStep(STEPS_FORM_CREATE_POST.START)
                 setFile(null)
-                setCurrentStep(STEPS_FORM_CREATE_POST.TEXT)
+                setUploadedImageUrl(null)
+                setUploadedImageFilteredUrl(null)
+                setIsImageLoading(true)
+              }}
+            >
+              <Icon className='h-5 w-5 text-[#fff1f1]' id='close' />
+            </button>
+          </div>
+        ) : uploadedImageUrl && currentStep !== STEPS_FORM_CREATE_POST.CROP ? (
+          <div className='relative flex h-[480px] w-full items-center justify-center'>
+            <img alt={file?.name} className='h-auto w-auto' src={uploadedImageUrl} />
+
+            <button
+              className='animate-fadeIn absolute left-1 top-1 rounded-full border-2 border-[#a50f0f] bg-[#26262690] p-1 transition-opacity duration-100 ease-linear hover:opacity-80 sm:p-1.5'
+              type='button'
+              onClick={() => {
+                setCurrentStep(STEPS_FORM_CREATE_POST.START)
+                setFile(null)
+                setUploadedImageUrl(null)
+                setUploadedImageFilteredUrl(null)
+                setIsImageLoading(true)
               }}
             >
               <Icon className='h-5 w-5 text-[#fff1f1]' id='close' />
@@ -166,7 +202,8 @@ export default function FormCreatePost({ session }: { session: SessionAuth | nul
           disabled={
             !session ||
             currentStep === STEPS_FORM_CREATE_POST.APPLY_FILTER ||
-            currentStep === STEPS_FORM_CREATE_POST.COMPLETED
+            currentStep === STEPS_FORM_CREATE_POST.COMPLETED ||
+            currentStep === STEPS_FORM_CREATE_POST.APLYING_FILTER
           }
           id='postInputFile'
           type='file'
@@ -178,7 +215,8 @@ export default function FormCreatePost({ session }: { session: SessionAuth | nul
             'pointer-events-none opacity-40':
               !session ||
               currentStep === STEPS_FORM_CREATE_POST.APPLY_FILTER ||
-              currentStep === STEPS_FORM_CREATE_POST.COMPLETED,
+              currentStep === STEPS_FORM_CREATE_POST.COMPLETED ||
+              currentStep === STEPS_FORM_CREATE_POST.APLYING_FILTER,
           })}
           htmlFor='postInputFile'
         >
@@ -191,9 +229,9 @@ export default function FormCreatePost({ session }: { session: SessionAuth | nul
 
         <ApplyFilter
           currentStep={currentStep}
-          setCurrentStep={setCurrentStep}
+          updateCurrentStep={updateCurrentStep}
           updateIsImageLoading={updateIsImageLoading}
-          updateUploadedImageUrl={updateUploadedImageUrl}
+          updateUploadedImageFilteredUrl={updateUploadedImageFilteredUrl}
           uploadedImageUrl={uploadedImageUrl}
         />
 
@@ -201,10 +239,15 @@ export default function FormCreatePost({ session }: { session: SessionAuth | nul
           className={cn(
             'w-16 rounded-md bg-[#00ff00] font-bold text-[#0d0d0d] transition-opacity duration-100 ease-linear hover:opacity-80',
             {
-              'pointer-events-none opacity-40': currentStep === STEPS_FORM_CREATE_POST.CROP,
+              'pointer-events-none opacity-40':
+                currentStep === STEPS_FORM_CREATE_POST.CROP ||
+                currentStep === STEPS_FORM_CREATE_POST.APLYING_FILTER,
             },
           )}
-          disabled={currentStep === STEPS_FORM_CREATE_POST.CROP}
+          disabled={
+            currentStep === STEPS_FORM_CREATE_POST.CROP ||
+            currentStep === STEPS_FORM_CREATE_POST.APLYING_FILTER
+          }
         >
           Send
         </SubmitFormButton>

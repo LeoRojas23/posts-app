@@ -13,18 +13,18 @@ interface Props {
   uploadedImageUrl: string | null
   currentStep: (typeof STEPS_FORM_CREATE_POST)[keyof typeof STEPS_FORM_CREATE_POST]
   updateIsImageLoading: (value: boolean) => void
-  updateUploadedImageUrl: (value: string) => void
-  setCurrentStep: (
+  updateCurrentStep: (
     step: (typeof STEPS_FORM_CREATE_POST)[keyof typeof STEPS_FORM_CREATE_POST],
   ) => void
+  updateUploadedImageFilteredUrl: (value: string) => void
 }
 
 export default function ApplyFilter({
   uploadedImageUrl,
   currentStep,
   updateIsImageLoading,
-  updateUploadedImageUrl,
-  setCurrentStep,
+  updateCurrentStep,
+  updateUploadedImageFilteredUrl,
 }: Props) {
   const applyImageFilter = async (filterValue: MainOptionKeys) => {
     if (!uploadedImageUrl) return
@@ -34,11 +34,10 @@ export default function ApplyFilter({
     try {
       const newUrl = await applyFilterToImage(uploadedImageUrl, filterValue)
 
-      updateUploadedImageUrl(newUrl)
+      updateUploadedImageFilteredUrl(newUrl)
+      updateCurrentStep(STEPS_FORM_CREATE_POST.APLYING_FILTER)
     } catch (error) {
       console.log(error)
-    } finally {
-      setCurrentStep(STEPS_FORM_CREATE_POST.COMPLETED)
     }
   }
 
@@ -54,14 +53,18 @@ export default function ApplyFilter({
                   'cursor-not-allowed opacity-40': currentStep === STEPS_FORM_CREATE_POST.COMPLETED,
                 },
               )}
+              defaultValue='default'
               disabled={currentStep === STEPS_FORM_CREATE_POST.COMPLETED}
               onChange={e => {
                 applyImageFilter(e.target.value as MainOptionKeys)
               }}
             >
-              <option selected className='text-sm font-medium'>
+              <option className='text-sm font-medium' value='default'>
                 Choose a filter
               </option>
+              {/* <option disabled hidden className='text-sm font-medium' value=''>
+                Choose a filter
+              </option> */}
               {filterOptions.map(option => (
                 <option key={option.value} className='text-sm font-medium' value={option.value}>
                   {option.label}

@@ -43,9 +43,10 @@ export const BACKGROUND_FILTER_MAP = new Map<string, BackgroundEffectKeys>([
 export type MainOptionKeys = 'zombie' | 'vampire' | 'terrifying' | 'clown'
 
 export const STEPS_FORM_CREATE_POST = {
-  TEXT: 'text',
+  START: 'start',
   CROP: 'crop',
   APPLY_FILTER: 'applyFilter',
+  APLYING_FILTER: 'aplyingFilter',
   COMPLETED: 'completed',
 } as const
 
