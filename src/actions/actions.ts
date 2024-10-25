@@ -22,12 +22,7 @@ import { CreateCommentSchema } from '@/validations/create-comment'
 import { UpdateSettingsSchema } from '@/validations/update-settings'
 import { lucia, validateRequest } from '@/lib/lucia'
 import { github, google } from '@/lib/oauth'
-import {
-  BACKGROUND_FILTER_MAP,
-  getPublicId,
-  MainOptionKeys,
-  TRANSFORMATION_EFFECTS,
-} from '@/utils/utils'
+import { getPublicId } from '@/utils/utils'
 
 const cloudinaryConfig = cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -40,14 +35,13 @@ async function uploadImageToCloudinary(fileUri: string | undefined) {
   if (!fileUri) return undefined
 
   try {
-    const uploadResult = await cloudinary.uploader.unsigned_upload(
-      fileUri,
-      'upload-unsigned-images',
-    )
+    const uploadResult = await cloudinary.uploader.upload(fileUri, {
+      transformation: [{ radius: 6 }],
+      invalidate: true,
+    })
 
     return uploadResult
-  } catch (error) {
-    console.log(error)
+  } catch {
     throw new Error('Failed to upload image to Cloudinary.')
   }
 }
@@ -206,35 +200,6 @@ export const processAndUploadImage = async (formData: FormData) => {
     return {
       error: 'An error ocurred while processing the image.',
     }
-  }
-}
-
-export async function applyFilterToImage(url: string, keyValue: MainOptionKeys) {
-  try {
-    const publicId = getPublicId(url)
-
-    if (!publicId) {
-      throw new Error('Invalid publicId')
-    }
-
-    const transformationEffects: Array<string> = [TRANSFORMATION_EFFECTS[keyValue]]
-
-    const backgroundSelected = BACKGROUND_FILTER_MAP.get(keyValue)
-
-    if (backgroundSelected) {
-      transformationEffects.push(TRANSFORMATION_EFFECTS[backgroundSelected])
-    }
-
-    const transformedUrl = cloudinary.url(publicId, {
-      transformation: transformationEffects.map(effect => ({ effect })),
-      radius: 6,
-    })
-
-    return transformedUrl
-  } catch (error) {
-    console.log(error)
-
-    throw new Error('Failed to apply filter to image')
   }
 }
 

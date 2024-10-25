@@ -13,40 +13,9 @@ export const getPublicId = (url: string): string | null => {
   return match ? match[1] : null
 }
 
-export const TRANSFORMATION_EFFECTS = {
-  zombie:
-    'gen_replace:from_people;to_a%20terrifying%20zombie%20with%20greenish%20gray%20skin%20and%20mangled%20facial%20features%20wearing%20a%20tattered%20fur%20cloak%20and%20holding%20a%20bloodied%20axe;preserve-geometry_true;multiple_true',
-  'background-zombie':
-    'gen_background_replace:prompt_A%20dark%20and%20foreboding%20graveyard%20scene%20with%20overgrown%20tombstones%20shrouded%20in%20mist%20and%20ghostly%20figures%20lurking%20in%20the%20shadows%20beneath%20a%20blood-red%20moon;seed_1',
-  vampire:
-    'gen_replace:from_people;to_a%20terrifying%20vampire%20with%20pale%20skin%20and%20sharp%20fangs%20wearing%20a%20long%20black%20cape%20and%20holding%20a%20gothic%20candelabrum%20or%20any%20relevant%20object%20that%20fits%20the%20vampire%20theme;preserve-geometry_true;multiple_false',
-  'background-vampire':
-    'gen_background_replace:prompt_A%20gloomy%20graveyard%20at%20midnight%20with%20ancient%20tombstones%20overgrown%20with%20vines%20and%20dark%20clouds%20hovering%20overhead%20while%20a%20full%20moon%20casts%20an%20eerie%20light%20on%20the%20scene;seed_2',
-  terrifying:
-    'gen_background_replace:prompt_An%20abandoned%20hospital%20with%20dark%20hallways%20flickering%20fluorescent%20lights%20rusted%20hospital%20beds%20and%20medical%20equipment%20scattered%20across%20the%20floor%20walls%20covered%20in%20peeling%20paint%20and%20bloody%20handprints%20thick%20fog%20rolling%20in%20and%20echoes%20of%20distant%20whispers;seed_1',
-  clown:
-    'gen_replace:from_people;to_a%20malevolent%20clown%20with%20a%20twisted%20smile%20wearing%20a%20tattered%20costume%20covered%20in%20blood%20and%20holding%20a%20bloody%20balloon;preserve-geometry_true;multiple_false',
-  'background-clown':
-    'gen_background_replace:prompt_A%20a%20creepy%20circus%20scene%20with%20dilapidated%20tents%20and%20blood%20stains%20on%20the%20ground%20with%20faint%20echoes%20of%20laughter%20and%20shadows%20of%20ominous%20figures%20lurking%20in%20the%20background;seed_2',
-}
-
-export type TransformationEffectKeys = keyof typeof TRANSFORMATION_EFFECTS
-
-type BackgroundEffectKeys = 'background-zombie' | 'background-vampire' | 'background-clown'
-
-export const BACKGROUND_FILTER_MAP = new Map<string, BackgroundEffectKeys>([
-  ['zombie', 'background-zombie'],
-  ['vampire', 'background-vampire'],
-  ['clown', 'background-clown'],
-])
-
-export type MainOptionKeys = 'zombie' | 'vampire' | 'terrifying' | 'clown'
-
 export const STEPS_FORM_CREATE_POST = {
   START: 'start',
   CROP: 'crop',
-  APPLY_FILTER: 'applyFilter',
-  APLYING_FILTER: 'aplyingFilter',
   COMPLETED: 'completed',
 } as const
 
