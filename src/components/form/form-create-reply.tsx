@@ -34,6 +34,12 @@ export default function FormCreateReply({ name, fromPostView, fromPostId, textar
         id={textareaId ?? 'replyTextarea'}
         name={name}
         placeholder='Write a comment'
+        onKeyDown={e => {
+          if ((e.ctrlKey || e.metaKey) && (e.key === 'Enter' || e.key === 'NumpadEnter')) {
+            e.preventDefault()
+            e.currentTarget.form?.requestSubmit()
+          }
+        }}
       />
       <button
         className={cn(
