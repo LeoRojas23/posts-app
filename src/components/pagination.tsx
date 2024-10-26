@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 
+import Icon from './icon'
+
 import { cn } from '@/utils/cn'
 
 export default function Pagination({ totalPages }: { totalPages: number }) {
@@ -21,20 +23,26 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
   return (
     <section className='my-4 flex w-full items-center justify-center gap-10'>
       <Link
-        className={cn('rounded-md bg-[#00ff00] px-2 py-1 font-semibold text-[#0d0d0d]', {
-          'pointer-events-none opacity-40': currentPage - 1 === 0,
-        })}
+        className={cn(
+          'rounded-md border border-[#00b4f1] px-2 py-1 font-semibold text-neutral-200',
+          {
+            'pointer-events-none opacity-40': currentPage - 1 === 0,
+          },
+        )}
         href={createPageUrl(currentPage - 1)}
       >
-        Prev
+        <Icon className='size-6 text-neutral-200' id='left' />
       </Link>
       <Link
-        className={cn('rounded-md bg-[#00ff00] px-2 py-1 font-semibold text-[#0d0d0d]', {
-          'pointer-events-none opacity-40': currentPage >= totalPages,
-        })}
+        className={cn(
+          'rounded-md border border-[#00b4f1] px-2 py-1 font-semibold text-neutral-200',
+          {
+            'pointer-events-none opacity-40': currentPage >= totalPages,
+          },
+        )}
         href={createPageUrl(currentPage + 1)}
       >
-        Next
+        <Icon className='size-6 text-neutral-200' id='right' />
       </Link>
     </section>
   )
