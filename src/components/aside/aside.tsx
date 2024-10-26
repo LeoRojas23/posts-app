@@ -32,8 +32,8 @@ export default async function Aside() {
             {values?.map(value => (
               <li key={value.id} className='flex w-full items-center justify-center'>
                 <NavLink
-                  activeClassName='[&>svg]:text-[#00ff00] [&>p]:text-neutral-200 [&>p]:font-semibold'
-                  className='flex w-fit rounded-md p-2 text-neutral-300 hover:bg-neutral-700 lg:w-full lg:justify-start lg:gap-4 lg:pl-1'
+                  activeClassName='[&>svg]:text-[#00b4f1] [&>p]:text-neutral-200 [&>p]:font-semibold'
+                  className='flex w-fit rounded-md p-2 text-neutral-300 hover:bg-[#3d3d3d90] lg:w-full lg:justify-start lg:gap-4 lg:pl-1'
                   href={value.href}
                   match={value.text === 'Profile' ? '^/profile' : undefined}
                 >
@@ -46,7 +46,7 @@ export default async function Aside() {
 
           <footer className='relative flex h-fit w-full items-center justify-center lg:justify-start'>
             <details className='lg:w-full [&>summary]:open:bg-neutral-700' name='toggleLogout'>
-              <summary className='cursor-pointer list-none rounded-md px-1 py-1.5 transition-colors duration-100 ease-linear hover:bg-neutral-700 lg:flex lg:items-center lg:justify-between lg:gap-2'>
+              <summary className='cursor-pointer list-none rounded-md px-1 py-1.5 transition-colors duration-100 ease-linear hover:bg-[#3d3d3d90] lg:flex lg:items-center lg:justify-between lg:gap-2'>
                 <img
                   alt={user.name}
                   className='h-10 w-10 rounded-md lg:h-10 lg:w-10'
@@ -62,7 +62,7 @@ export default async function Aside() {
               </summary>
               <AuthButton
                 action='signOut'
-                className='absolute inset-x-0 bottom-[50px] w-full rounded-md bg-[#00ff00] py-1 text-sm font-bold text-[#0d0d0d] transition-opacity duration-100 ease-linear hover:opacity-90 lg:bottom-[56px] lg:text-base'
+                className='absolute inset-x-0 bottom-[50px] w-full rounded-md bg-[#00b4f1] py-1 text-sm font-bold text-[#0d0d0d] transition-opacity duration-100 ease-linear hover:opacity-90 lg:bottom-[56px] lg:text-base'
               >
                 Logout
               </AuthButton>
@@ -72,7 +72,7 @@ export default async function Aside() {
       ) : (
         <section className='mt-2 flex'>
           <Link
-            className='mx-auto flex items-center justify-start rounded-md bg-[#00ff00] px-2 py-2 font-semibold text-[#0d0d0d]'
+            className='mx-auto flex items-center justify-start rounded-md bg-[#00b4f1] px-2 py-2 font-semibold text-[#0d0d0d]'
             href='/sign-in'
           >
             Sign in

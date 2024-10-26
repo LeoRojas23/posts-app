@@ -54,12 +54,12 @@ export default function CreateReplyPost({ postId, commentsLength, path, session 
   return (
     <form ref={ref} action={formAction} className='w-full'>
       <details
-        className='flex w-full items-center justify-center [&>summary>svg]:open:text-[#00ff00]'
+        className='flex w-full items-center justify-center [&>summary>svg]:open:text-[#00b4f1]'
         name='postDetails'
       >
         <summary className='group/reply-svg-post mx-auto flex w-fit cursor-pointer list-none items-center justify-start gap-1.5 py-1.5'>
           <Icon
-            className='h-6 w-6 text-neutral-200 transition-colors duration-100 ease-linear sm:group-hover/reply-svg-post:text-[#00ff00]'
+            className='h-6 w-6 text-neutral-200 transition-colors duration-100 ease-linear sm:group-hover/reply-svg-post:text-[#00b4f1]'
             id='commentIcon'
           />
           <span className='text-sm font-light tabular-nums text-neutral-200 sm:text-base'>

@@ -114,7 +114,7 @@ export default function ImageCropper({ file, onApply, onClose }: Props) {
       </button>
 
       <button
-        className='animate-fadeIn absolute right-1 top-1 rounded-full bg-[#00ff00] p-1 font-medium text-[#0d0d0d] sm:p-1.5'
+        className='animate-fadeIn absolute right-1 top-1 rounded-full bg-[#00b4f1] p-1 font-medium text-[#0d0d0d] sm:p-1.5'
         type='button'
         onClick={handleApply}
       >

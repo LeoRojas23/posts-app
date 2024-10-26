@@ -48,7 +48,7 @@ export default async function Nav({ slug }: { slug: string }) {
         {values.map(value => (
           <li key={value.id} className='flex'>
             <NavLink
-              activeClassName='border-b-2 border-b-[#00ff00] font-semibold text-neutral-200'
+              activeClassName='border-b-2 border-b-[#00b4f1] font-semibold text-neutral-200'
               className='p-1.5 text-neutral-300 sm:px-3'
               href={value.href}
             >

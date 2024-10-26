@@ -199,7 +199,7 @@ export default function ClientPage({ session }: Props) {
           </div>
         </div>
 
-        <SubmitFormButton className='mx-auto my-2 w-20 rounded-md bg-[#00ff00] font-bold text-[#0d0d0d] transition-opacity duration-100 ease-linear hover:opacity-90'>
+        <SubmitFormButton className='mx-auto my-2 w-20 rounded-md bg-[#00b4f1] font-bold text-[#0d0d0d] transition-opacity duration-100 ease-linear hover:opacity-90'>
           Save
         </SubmitFormButton>
       </footer>

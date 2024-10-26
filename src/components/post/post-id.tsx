@@ -92,7 +92,7 @@ export default async function PostId({ slug, id }: Props) {
           htmlFor='focusTextarea'
         >
           <Icon
-            className='h-6 w-6 transition-colors duration-100 ease-linear group-hover/reply-svg-post-id:text-[#00ff00]'
+            className='h-6 w-6 transition-colors duration-100 ease-linear group-hover/reply-svg-post-id:text-[#00b4f1]'
             id='commentIcon'
           />
           <span className='text-sm font-light tabular-nums text-neutral-200 sm:text-base'>

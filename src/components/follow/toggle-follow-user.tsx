@@ -50,9 +50,9 @@ export default function ToggleFollowUser({ path, userToFollow, session, showIcon
       <SubmitFormButton
         disableDots
         className={cn({
-          'flex w-full items-center justify-start gap-1.5 rounded-md px-1 transition-colors duration-100 ease-linear hover:bg-neutral-700':
+          'flex w-full items-center justify-start gap-1.5 rounded-md px-1 transition-colors duration-100 ease-linear hover:bg-[#3d3d3d50]':
             showIcon,
-          'rounded-md bg-[#00ff00] px-2 font-bold text-[#0d0d0d] transition-opacity duration-100 ease-linear hover:opacity-90':
+          'rounded-md bg-[#00b4f1] px-2 font-bold text-[#0d0d0d] transition-opacity duration-100 ease-linear hover:opacity-90':
             !showIcon,
         })}
       >

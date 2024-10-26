@@ -173,7 +173,7 @@ export default function FormCreatePost({ session }: { session: SessionAuth | nul
 
         <SubmitFormButton
           className={cn(
-            'w-16 rounded-md bg-[#00ff00] font-bold text-[#0d0d0d] transition-opacity duration-100 ease-linear hover:opacity-80',
+            'w-16 rounded-md bg-[#00b4f1] font-bold text-[#0d0d0d] transition-opacity duration-100 ease-linear hover:opacity-80',
             {
               'pointer-events-none opacity-40': currentStep === STEPS_FORM_CREATE_POST.CROP,
             },

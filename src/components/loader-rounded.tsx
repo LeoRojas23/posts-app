@@ -4,7 +4,7 @@ export default function LoaderRounded() {
       <div className='flex h-full w-full justify-center' role='status'>
         <svg
           aria-hidden='true'
-          className='h-12 w-12 animate-spin fill-[#00ff00] text-gray-600 sm:h-16 sm:w-16'
+          className='h-12 w-12 animate-spin fill-[#00b4f1] text-gray-600 sm:h-16 sm:w-16'
           fill='none'
           viewBox='0 0 100 101'
         >

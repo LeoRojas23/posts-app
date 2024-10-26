@@ -58,7 +58,7 @@ export default async function Nav() {
           >
             <AuthButton
               action='signOut'
-              className='w-16 rounded-md bg-[#00ff00] px-1 py-1 font-bold text-[#0d0d0d]'
+              className='w-16 rounded-md bg-[#00b4f1] px-1 py-1 font-bold text-[#0d0d0d]'
             >
               Logout
             </AuthButton>

@@ -16,10 +16,10 @@ export default async function ToggleInfo({ authorId, dataId, path, from }: Props
 
   return (
     <aside className='relative h-full w-fit'>
-      <details className='[&>summary>svg]:open:bg-neutral-700' name='toggleInfo'>
+      <details className='[&>summary>svg]:open:bg-[#3d3d3d90]' name='toggleInfo'>
         <summary className='list-none'>
           <Icon
-            className='h-6 w-6 cursor-pointer rounded-md text-neutral-200 transition-colors duration-100 ease-linear hover:bg-neutral-700'
+            className='h-6 w-6 cursor-pointer rounded-md text-neutral-200 transition-colors duration-100 ease-linear hover:bg-[#3d3d3d90]'
             id='toggleMoreInfo'
           />
         </summary>

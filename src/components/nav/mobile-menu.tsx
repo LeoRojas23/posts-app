@@ -124,7 +124,7 @@ export default function MobileMenu({
             ) : (
               <li className='flex h-fit w-full items-center justify-center border-b border-b-neutral-800 py-4'>
                 <Link
-                  className='rounded-md bg-[#00ff00] px-2 py-2 font-semibold text-[#0d0d0d]'
+                  className='rounded-md bg-[#00b4f1] px-2 py-2 font-semibold text-[#0d0d0d]'
                   href='/sign-in'
                 >
                   Sign in

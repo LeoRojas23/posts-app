@@ -48,7 +48,7 @@ export default function Search() {
           className={cn(
             'h-9 w-full rounded-md border border-neutral-800 bg-transparent pl-1 pr-[26px] text-sm text-neutral-300 placeholder-neutral-400 outline-none transition-colors duration-100 ease-linear sm:w-64 sm:pr-7',
             {
-              'border-[#00ff00]': pathname === '/search',
+              'border-[#00b4f1]': pathname === '/search',
               'focus:border-neutral-600': pathname !== '/search',
             },
           )}

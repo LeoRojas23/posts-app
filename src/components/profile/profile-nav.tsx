@@ -38,7 +38,7 @@ export default async function ProfileNav() {
         </p>
       </section>
       <Link
-        className='rounded-md bg-[#00ff00] px-2 py-1 font-bold text-[#0d0d0d] transition-opacity duration-100 ease-linear hover:opacity-90 sm:px-2.5 sm:py-1.5'
+        className='rounded-md bg-[#00b4f1] px-2 py-1 font-bold text-[#0d0d0d] transition-opacity duration-100 ease-linear hover:opacity-90 sm:px-2.5 sm:py-1.5'
         href='/settings'
       >
         Edit profile

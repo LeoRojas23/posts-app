@@ -26,7 +26,7 @@ export default function Nav({ values }: Props) {
         <li key={value.id}>
           <Link
             className={cn('p-1.5 text-neutral-300 sm:px-3', {
-              'border-b-2 border-b-[#00ff00] font-semibold text-neutral-200': filter === value.href,
+              'border-b-2 border-b-[#00b4f1] font-semibold text-neutral-200': filter === value.href,
             })}
             href={`${pathname}?q=${query}&f=${value.href}`}
           >
