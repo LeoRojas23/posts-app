@@ -5,7 +5,7 @@ import Like from '../like/like'
 import Reply from '../comment/reply'
 
 import { type Post } from '@/types'
-import { timeAgoPost } from '@/utils/utils'
+import { timeAgo } from '@/utils/utils'
 
 interface Props {
   post: Post
@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default async function PostWithReplies({ post, path }: Props) {
-  const timeAgo = timeAgoPost(post.createdAt)
+  const timeAgoPost = timeAgo(post.createdAt)
 
   return (
     <section className='flex'>
@@ -43,7 +43,7 @@ export default async function PostWithReplies({ post, path }: Props) {
             </h3>
             <span className='text-[6px] text-neutral-300'>●</span>
             <p className='text-sm text-neutral-400 underline-offset-[3px] hover:underline'>
-              {timeAgo}
+              {timeAgoPost}
             </p>
           </Link>
           <div className='my-auto'>

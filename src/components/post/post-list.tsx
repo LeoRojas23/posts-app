@@ -6,7 +6,7 @@ import Reply from '../comment/reply'
 
 import { cn } from '@/utils/cn'
 import { type Post } from '@/types'
-import { timeAgoPost } from '@/utils/utils'
+import { timeAgo } from '@/utils/utils'
 
 interface Props {
   posts: Post[]
@@ -18,7 +18,7 @@ export default async function PostList({ posts, path, className }: Props) {
   return (
     <>
       {posts?.map(post => {
-        const timeAgo = timeAgoPost(post.createdAt)
+        const timeAgoPost = timeAgo(post.createdAt)
 
         return (
           <article key={post.id} className={cn(className)}>
@@ -41,7 +41,7 @@ export default async function PostList({ posts, path, className }: Props) {
                 </h3>
                 <span className='text-[6px] text-neutral-300'>●</span>
                 <p className='text-sm text-neutral-400 underline-offset-[3px] hover:underline'>
-                  {timeAgo}
+                  {timeAgoPost}
                 </p>
               </Link>
               <ToggleInfo authorId={post.authorId} dataId={post.id} from='post' path={path} />

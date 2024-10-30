@@ -4,11 +4,11 @@ import ToggleInfo from '../info/toggle-info'
 import Like from '../like/like'
 import Reply from '../comment/reply'
 
-import { timeAgoPost } from '@/utils/utils'
+import { timeAgo } from '@/utils/utils'
 import { type LikedPostProfile as ILikedPostProfile } from '@/types'
 
 export default function LikedPost({ post, path }: { post: ILikedPostProfile; path: string }) {
-  const timeAgo = timeAgoPost(post.createdAt)
+  const timeAgoPost = timeAgo(post.createdAt)
 
   return (
     <article
@@ -34,7 +34,7 @@ export default function LikedPost({ post, path }: { post: ILikedPostProfile; pat
           </h3>
           <span className='text-[6px] text-neutral-300'>●</span>
           <p className='text-sm text-neutral-400 underline-offset-[3px] hover:underline'>
-            {timeAgo}
+            {timeAgoPost}
           </p>
         </Link>
         <ToggleInfo authorId={post.authorId} dataId={post.id} from='post' path={path} />

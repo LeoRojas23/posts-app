@@ -5,7 +5,7 @@ import ToggleInfo from '../info/toggle-info'
 import FooterReplyWrapper from './footer-reply-wrapper'
 
 import { type CommentReply } from '@/types'
-import { timeAgoComment } from '@/utils/utils'
+import { timeAgo } from '@/utils/utils'
 
 interface Props {
   comments: CommentReply[]
@@ -18,7 +18,7 @@ export default function RepliesList({ comments, path, authorUsername, postId }: 
   return (
     <>
       {comments.map(comment => {
-        const commentDate = timeAgoComment(comment.createdAt)
+        const commentDate = timeAgo(comment.createdAt)
 
         return (
           <section key={comment.id} className='flex [&>a>div]:last:hidden'>

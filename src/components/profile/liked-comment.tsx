@@ -9,7 +9,7 @@ import FooterReplyWrapper from './footer-reply-wrapper'
 import { type LikedCommentProfile as ILikedCommentProfile } from '@/types'
 import { db } from '@/db'
 import { commentTable, postTable, userTable } from '@/db/schema'
-import { timeAgoComment } from '@/utils/utils'
+import { timeAgo } from '@/utils/utils'
 
 interface Props {
   comment: ILikedCommentProfile
@@ -17,7 +17,7 @@ interface Props {
 }
 
 export default async function LikedComment({ comment, path }: Props) {
-  const commentDate = timeAgoComment(comment.createdAt)
+  const commentDate = timeAgo(comment.createdAt)
 
   const parentComment = alias(commentTable, 'parentComment')
   const parentAuthor = alias(userTable, 'parentAuthor')

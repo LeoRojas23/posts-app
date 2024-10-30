@@ -6,7 +6,7 @@ import Like from '../like/like'
 
 import Reply from './reply'
 
-import { timeAgoComment } from '@/utils/utils'
+import { timeAgo } from '@/utils/utils'
 import { type CommentOfPostId } from '@/types'
 
 interface CommentProps {
@@ -17,7 +17,7 @@ interface CommentProps {
 }
 
 export default async function CommentView({ comment, slug, id, showForm }: CommentProps) {
-  const commentDate = timeAgoComment(comment.createdAt)
+  const commentDate = timeAgo(comment.createdAt)
 
   return (
     <>
