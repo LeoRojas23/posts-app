@@ -6,39 +6,92 @@ import {
   primaryKey,
   type AnySQLiteColumn,
 } from 'drizzle-orm/sqlite-core'
+import { AdapterAccountType } from 'next-auth/adapters'
 
-export const userTable = sqliteTable('user', {
-  id: text('id').notNull().primaryKey(),
+export const users = sqliteTable('user', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text('name'),
   email: text('email').unique(),
-  name: text('name').notNull(),
-  username: text('username').unique().notNull(),
-  image: text('image').notNull(),
+  emailVerified: integer('emailVerified', { mode: 'timestamp_ms' }),
+  image: text('image'),
+  username: text('username').unique(),
   createdAt: text('created_at')
     .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`)
     .notNull(),
 })
 
-export const oauthAccountTable = sqliteTable('oauth_account', {
-  id: text('id').primaryKey(),
-  userId: text('user_id')
+export const accounts = sqliteTable(
+  'account',
+  {
+    userId: text('userId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    type: text('type').$type<AdapterAccountType>().notNull(),
+    provider: text('provider').notNull(),
+    providerAccountId: text('providerAccountId').notNull(),
+    refresh_token: text('refresh_token'),
+    access_token: text('access_token'),
+    expires_at: integer('expires_at'),
+    token_type: text('token_type'),
+    scope: text('scope'),
+    id_token: text('id_token'),
+    session_state: text('session_state'),
+  },
+  account => ({
+    compoundKey: primaryKey({
+      columns: [account.provider, account.providerAccountId],
+    }),
+  }),
+)
+
+export const sessions = sqliteTable('session', {
+  sessionToken: text('sessionToken').primaryKey(),
+  userId: text('userId')
     .notNull()
-    .references(() => userTable.id, { onDelete: 'cascade' }),
-  provider: text('provider').notNull(),
-  providerUserId: text('provider_user_id').notNull(),
-  accessToken: text('access_token').notNull(),
-  refreshToken: text('refresh_token'),
-  expiresAt: integer('expires_at', { mode: 'timestamp' }),
+    .references(() => users.id, { onDelete: 'cascade' }),
+  expires: integer('expires', { mode: 'timestamp_ms' }).notNull(),
 })
 
-export const sessionTable = sqliteTable('session', {
-  id: text('id').notNull().primaryKey(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => userTable.id, { onDelete: 'cascade' }),
-  expiresAt: integer('expires_at').notNull(),
-})
+export const verificationTokens = sqliteTable(
+  'verificationToken',
+  {
+    identifier: text('identifier').notNull(),
+    token: text('token').notNull(),
+    expires: integer('expires', { mode: 'timestamp_ms' }).notNull(),
+  },
+  verificationToken => ({
+    compositePk: primaryKey({
+      columns: [verificationToken.identifier, verificationToken.token],
+    }),
+  }),
+)
 
-export const userRelations = relations(userTable, ({ many }) => ({
+export const authenticators = sqliteTable(
+  'authenticator',
+  {
+    credentialID: text('credentialID').notNull().unique(),
+    userId: text('userId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    providerAccountId: text('providerAccountId').notNull(),
+    credentialPublicKey: text('credentialPublicKey').notNull(),
+    counter: integer('counter').notNull(),
+    credentialDeviceType: text('credentialDeviceType').notNull(),
+    credentialBackedUp: integer('credentialBackedUp', {
+      mode: 'boolean',
+    }).notNull(),
+    transports: text('transports'),
+  },
+  authenticator => ({
+    compositePK: primaryKey({
+      columns: [authenticator.userId, authenticator.credentialID],
+    }),
+  }),
+)
+
+export const userRelations = relations(users, ({ many }) => ({
   posts: many(postTable),
   postLike: many(postLikeTable),
   comments: many(commentTable),
@@ -51,10 +104,10 @@ export const followTable = sqliteTable(
   {
     followerId: text('follower_id')
       .notNull()
-      .references(() => userTable.id, { onDelete: 'cascade' }),
+      .references(() => users.id, { onDelete: 'cascade' }),
     followingId: text('following_id')
       .notNull()
-      .references(() => userTable.id, { onDelete: 'cascade' }),
+      .references(() => users.id, { onDelete: 'cascade' }),
   },
   t => ({
     pk: primaryKey({ columns: [t.followerId, t.followingId] }),
@@ -62,14 +115,14 @@ export const followTable = sqliteTable(
 )
 
 export const followRelations = relations(followTable, ({ one }) => ({
-  follower: one(userTable, {
+  follower: one(users, {
     fields: [followTable.followerId],
-    references: [userTable.id],
+    references: [users.id],
     relationName: 'followers',
   }),
-  followee: one(userTable, {
+  followee: one(users, {
     fields: [followTable.followingId],
-    references: [userTable.id],
+    references: [users.id],
     relationName: 'following',
   }),
 }))
@@ -86,13 +139,13 @@ export const postTable = sqliteTable('post', {
     .notNull(),
   authorId: text('author_id')
     .notNull()
-    .references(() => userTable.id, { onDelete: 'cascade' }),
+    .references(() => users.id, { onDelete: 'cascade' }),
 })
 
 export const postRelations = relations(postTable, ({ one, many }) => ({
-  author: one(userTable, {
+  author: one(users, {
     fields: [postTable.authorId],
-    references: [userTable.id],
+    references: [users.id],
   }),
   postLike: many(postLikeTable),
   comments: many(commentTable),
@@ -103,7 +156,7 @@ export const postLikeTable = sqliteTable(
   {
     userId: text('user_id')
       .notNull()
-      .references(() => userTable.id, { onDelete: 'cascade' }),
+      .references(() => users.id, { onDelete: 'cascade' }),
     postId: text('post_id')
       .notNull()
       .references(() => postTable.id, { onDelete: 'cascade' }),
@@ -121,9 +174,9 @@ export const postLikeRelations = relations(postLikeTable, ({ one }) => ({
     fields: [postLikeTable.postId],
     references: [postTable.id],
   }),
-  user: one(userTable, {
+  user: one(users, {
     fields: [postLikeTable.userId],
-    references: [userTable.id],
+    references: [users.id],
   }),
 }))
 
@@ -138,7 +191,7 @@ export const commentTable = sqliteTable('comment', {
     .notNull(),
   authorId: text('author_id')
     .notNull()
-    .references(() => userTable.id, { onDelete: 'cascade' }),
+    .references(() => users.id, { onDelete: 'cascade' }),
   postId: text('post_id')
     .notNull()
     .references(() => postTable.id, { onDelete: 'cascade' }),
@@ -148,9 +201,9 @@ export const commentTable = sqliteTable('comment', {
 })
 
 export const commentRelations = relations(commentTable, ({ one, many }) => ({
-  author: one(userTable, {
+  author: one(users, {
     fields: [commentTable.authorId],
-    references: [userTable.id],
+    references: [users.id],
   }),
   commentLikes: many(commentLikeTable),
   post: one(postTable, {
@@ -170,7 +223,7 @@ export const commentLikeTable = sqliteTable(
   {
     userId: text('user_id')
       .notNull()
-      .references(() => userTable.id, { onDelete: 'cascade' }),
+      .references(() => users.id, { onDelete: 'cascade' }),
     commentId: text('comment_id')
       .notNull()
       .references(() => commentTable.id, { onDelete: 'cascade' }),
@@ -188,8 +241,8 @@ export const commentLikeRelations = relations(commentLikeTable, ({ one }) => ({
     fields: [commentLikeTable.commentId],
     references: [commentTable.id],
   }),
-  user: one(userTable, {
+  user: one(users, {
     fields: [commentLikeTable.userId],
-    references: [userTable.id],
+    references: [users.id],
   }),
 }))

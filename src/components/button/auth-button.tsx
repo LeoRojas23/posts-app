@@ -1,12 +1,6 @@
-import { redirect } from 'next/navigation'
-
-import {
-  createGithubAuthorizationURL,
-  createGoogleAuthorizationURL,
-  signOut,
-} from '../../actions/actions'
-
 import SubmitFormButton from './submit-form-button'
+
+import { signIn, signOut } from '@/auth'
 
 interface Props {
   className: string
@@ -18,22 +12,13 @@ interface Props {
 export default function AuthButton({ className, children, action, provider }: Props) {
   async function formAction() {
     'use server'
-    let res
 
     if (action === 'signOut') {
-      res = await signOut()
+      await signOut({ redirectTo: '/' })
     } else if (provider === 'google' && action === 'signIn') {
-      res = await createGoogleAuthorizationURL()
+      await signIn('google', { redirectTo: '/' })
     } else if (provider === 'github' && action === 'signIn') {
-      res = await createGithubAuthorizationURL()
-    }
-
-    if (res?.error) {
-      console.log(res.error)
-    } else if (res?.success && 'data' in res && res.data) {
-      redirect(res.data.toString())
-    } else {
-      redirect('/')
+      await signIn('github', { redirectTo: '/' })
     }
   }
 
