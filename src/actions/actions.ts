@@ -4,8 +4,6 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { v2 as cloudinary } from 'cloudinary'
 import { and, eq } from 'drizzle-orm'
-import { generateCodeVerifier, generateState } from 'arctic'
-import { cookies } from 'next/headers'
 
 import { db } from '@/db'
 import { resizePostImage, resizeProfileImage } from '@/utils/resize-images'
@@ -15,14 +13,13 @@ import {
   followTable,
   postLikeTable,
   postTable,
-  userTable,
+  users,
 } from '@/db/schema'
 import { CreatePostSchema } from '@/validations/create-post'
 import { CreateCommentSchema } from '@/validations/create-comment'
 import { UpdateSettingsSchema } from '@/validations/update-settings'
-import { lucia, validateRequest } from '@/lib/lucia'
-import { github, google } from '@/lib/oauth'
 import { getPublicId } from '@/utils/utils'
+import { auth } from '@/auth'
 
 const cloudinaryConfig = cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -83,101 +80,6 @@ export async function getSignature() {
   return { timestamp, signature }
 }
 
-export const createGoogleAuthorizationURL = async () => {
-  try {
-    const state = generateState()
-    const codeVerifier = generateCodeVerifier()
-
-    cookies().set('codeVerifier', codeVerifier, {
-      httpOnly: true,
-    })
-
-    cookies().set('state', state, {
-      httpOnly: true,
-    })
-
-    const authorizationURL = await google.createAuthorizationURL(state, codeVerifier, {
-      scopes: ['email', 'profile'],
-    })
-
-    return {
-      success: true,
-      data: authorizationURL,
-    }
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      }
-    }
-
-    return {
-      error: 'An unknown error occurred',
-    }
-  }
-}
-
-export const createGithubAuthorizationURL = async () => {
-  try {
-    const state = generateState()
-
-    cookies().set('state', state, {
-      httpOnly: true,
-    })
-
-    const authorizationURL = await github.createAuthorizationURL(state, {
-      scopes: ['user:email'],
-    })
-
-    return {
-      success: true,
-      data: authorizationURL,
-    }
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      }
-    }
-
-    return {
-      error: 'An unknown error occurred',
-    }
-  }
-}
-
-export const signOut = async () => {
-  try {
-    const { session } = await validateRequest()
-
-    if (!session) {
-      return {
-        error: 'Unauthorized',
-      }
-    }
-
-    await lucia.invalidateSession(session.id)
-
-    const sessionCookie = lucia.createBlankSessionCookie()
-
-    cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
-
-    return {
-      success: true,
-    }
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      }
-    }
-
-    return {
-      error: 'An unknown error occurred',
-    }
-  }
-}
-
 export const processAndUploadImage = async (formData: FormData) => {
   const imageFile = formData.get('postImage') as File
 
@@ -204,7 +106,7 @@ export const processAndUploadImage = async (formData: FormData) => {
 }
 
 export const createPost = async (formData: FormData, imageUrl: string | null) => {
-  const { session } = await validateRequest()
+  const session = await auth()
 
   if (!session) return
 
@@ -261,16 +163,17 @@ export const toggleLike = async (dataId: string, from: 'post' | 'comment', path:
 }
 
 export const deletePost = async (postId: string) => {
-  const { session } = await validateRequest()
+  const session = await auth()
 
   if (!session) return
 
-  const urlImagePost = await db.query.postTable.findFirst({
-    where: and(eq(postTable.id, postId), eq(postTable.authorId, session.userId)),
-    columns: {
-      image: true,
-    },
-  })
+  const urlImagePost = await db
+    .select({
+      image: postTable.image,
+    })
+    .from(postTable)
+    .where(and(eq(postTable.id, postId), eq(postTable.authorId, session.userId)))
+    .then(res => res[0])
 
   await db
     .delete(postTable)
@@ -282,7 +185,7 @@ export const deletePost = async (postId: string) => {
 }
 
 export const toggleLikePost = async (postId: string) => {
-  const { session } = await validateRequest()
+  const session = await auth()
 
   if (!session) return
 
@@ -307,7 +210,7 @@ export const toggleLikePost = async (postId: string) => {
 }
 
 export const followUser = async (userToFollow: string, path: string) => {
-  const { session } = await validateRequest()
+  const session = await auth()
 
   if (!session) return
 
@@ -345,7 +248,7 @@ export const createComment = async (
   path: string,
   parentId?: string,
 ) => {
-  const { session } = await validateRequest()
+  const session = await auth()
 
   if (!session) return
 
@@ -378,7 +281,7 @@ export const createComment = async (
 }
 
 export const deleteComment = async (commentId: string) => {
-  const { session } = await validateRequest()
+  const session = await auth()
 
   if (!session) return
 
@@ -386,7 +289,7 @@ export const deleteComment = async (commentId: string) => {
 }
 
 export const toggleLikeComment = async (commentId: string) => {
-  const { session } = await validateRequest()
+  const session = await auth()
 
   if (!session) return
 
@@ -415,9 +318,9 @@ export const toggleLikeComment = async (commentId: string) => {
 }
 
 export const updateSettings = async (formData: FormData) => {
-  const { user } = await validateRequest()
+  const session = await auth()
 
-  if (!user) return
+  if (!session) return
 
   const name = (formData.get('name') as string) || undefined
   const username = (formData.get('username') as string) || undefined
@@ -443,13 +346,13 @@ export const updateSettings = async (formData: FormData) => {
 
   const fileImageOptimized = await resizeProfileImage(fileBuffer, mime)
 
-  if (result.data.username !== undefined && result.data.username !== user.username) {
+  if (result.data.username !== undefined && result.data.username !== session.user.username) {
     const existingUser = await db
       .select({
-        username: userTable.username,
+        username: users.username,
       })
-      .from(userTable)
-      .where(eq(userTable.username, result.data.username))
+      .from(users)
+      .where(eq(users.username, result.data.username))
       .then(res => res[0])
 
     if (existingUser) {
@@ -463,26 +366,26 @@ export const updateSettings = async (formData: FormData) => {
 
   const imageProfile = await db
     .select({
-      image: userTable.image,
+      image: users.image,
     })
-    .from(userTable)
-    .where(eq(userTable.id, user.id))
+    .from(users)
+    .where(eq(users.id, session.userId))
     .then(res => res[0])
 
   await db
-    .update(userTable)
+    .update(users)
     .set({
       image: cloudinaryImage?.secure_url,
       name: result.data.name,
       username: result.data.username,
     })
-    .where(eq(userTable.id, user.id))
+    .where(eq(users.id, session.userId))
 
   if (result.data.image) {
     await deleteCloudinaryImage(imageProfile.image)
   }
 
-  const redirectUsername = result.data.username ?? user.username
+  const redirectUsername = result.data.username ?? session.user.username
 
   return redirect(`/profile/${redirectUsername}`)
 }
