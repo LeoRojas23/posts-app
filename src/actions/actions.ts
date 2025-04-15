@@ -36,7 +36,7 @@ const cloudinaryConfig = cloudinary.config({
   secure: true,
 })
 
-async function uploadImageToCloudinary(fileUri: string | undefined) {
+export async function uploadImageToCloudinary(fileUri: string | undefined) {
   if (!fileUri) return undefined
 
   try {
@@ -91,38 +91,6 @@ export async function manageAuth({
       return redirect(res.url)
     } else {
       throw new Error('Redirect url not found')
-    }
-  }
-}
-
-export const processAndUploadImage = async ({
-  formData,
-  from,
-}: {
-  formData: FormData
-  from: 'post' | 'profile'
-}) => {
-  const content = Object.fromEntries(formData.entries())
-  const imageFile = Object.values(content)[0] as File
-
-  if (!imageFile) return
-
-  try {
-    const fileBuffer = await imageFile.arrayBuffer()
-    const mime = imageFile.type
-
-    const optimizedFile = await resizeImage({ fileBuffer, mime, from })
-
-    const result = await uploadImageToCloudinary(optimizedFile)
-
-    if (!result?.secure_url) {
-      return { error: 'Failed to upload image to Cloudinary.' }
-    }
-
-    return { url: result.secure_url }
-  } catch {
-    return {
-      error: 'An error ocurred while processing the image.',
     }
   }
 }
