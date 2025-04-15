@@ -11,7 +11,7 @@ import ImageCropper from './image-cropper'
 
 import { type CreatePostResponse, type FileWithPreview } from '@/types'
 import { cn } from '@/utils/cn'
-import { createPost, processAndUploadImage } from '@/actions/actions'
+import { createPost } from '@/actions/actions'
 import { STEPS_IMAGE_UPLOAD } from '@/utils/utils'
 import { ImageSchema } from '@/validations/image'
 
@@ -116,24 +116,34 @@ export default function FormCreatePost({ session }: { session: boolean }) {
             file={file}
             from='post'
             onApply={async blob => {
+              const formData = new FormData()
+              const croppedFile = new File([blob], file.name || 'cropped-image', {
+                type: blob.type,
+              })
+
+              formData.append('postImage', croppedFile)
+              formData.append('from', 'post')
+
               try {
-                const formData = new FormData()
-                const croppedFile = new File([blob], file.name || 'cropped-image', {
-                  type: blob.type,
+                const response = await fetch('/api/file', {
+                  method: 'POST',
+                  body: formData,
                 })
 
-                formData.append('postImage', croppedFile)
+                const result = await response.json()
 
-                const result = await processAndUploadImage({ formData, from: 'post' })
-
-                if (!result?.url) {
-                  throw new Error(result?.error)
+                if (!response.ok || !result.url) {
+                  throw new Error(
+                    result?.error || 'Image upload failed. Try again or reload the page.',
+                  )
                 }
 
                 setUploadedImageUrl(result.url)
                 setCurrentStep(STEPS_IMAGE_UPLOAD.COMPLETED)
               } catch (error) {
-                console.log(error)
+                if (error instanceof Error) {
+                  toast.error(error.message)
+                }
               }
             }}
             onClose={() => {

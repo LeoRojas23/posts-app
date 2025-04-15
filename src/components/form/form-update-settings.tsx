@@ -6,7 +6,7 @@ import { z } from 'zod'
 
 import ImageCropper from './image-cropper'
 
-import { processAndUploadImage, updateSettings } from '@/actions/actions'
+import { updateSettings } from '@/actions/actions'
 import { UpdateSettingsResponse, type FileWithPreview } from '@/types'
 import SubmitFormButton from '@/components/button/submit-form-button'
 import Icon from '@/components/icon'
@@ -120,24 +120,32 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
             file={file}
             from='profile'
             onApply={async blob => {
+              const formData = new FormData()
+              const croppedFile = new File([blob], file.name || 'cropped-image', {
+                type: blob.type,
+              })
+
+              formData.append('profileImage', croppedFile)
+              formData.append('from', 'profile')
+
               try {
-                const formData = new FormData()
-                const croppedFile = new File([blob], file.name || 'cropped-image', {
-                  type: blob.type,
+                const response = await fetch('/api/file', {
+                  method: 'POST',
+                  body: formData,
                 })
 
-                formData.append('profileImage', croppedFile)
+                const result = await response.json()
 
-                const result = await processAndUploadImage({ formData, from: 'profile' })
-
-                if (!result?.url) {
+                if (!response.ok || !result.url) {
                   throw new Error(result?.error)
                 }
 
                 setUploadedImageUrl(result.url)
                 setCurrentStep(STEPS_IMAGE_UPLOAD.COMPLETED)
               } catch (error) {
-                console.log(error)
+                if (error instanceof Error) {
+                  toast.error(error.message)
+                }
               }
             }}
             onClose={() => {
