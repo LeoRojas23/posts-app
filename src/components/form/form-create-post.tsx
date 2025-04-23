@@ -90,7 +90,7 @@ export default function FormCreatePost({ session }: { session: boolean }) {
         Write your post
       </label>
       <textarea
-        className='h-20 w-full resize-none border-b border-b-neutral-700 bg-transparent px-2 py-2 text-neutral-200 outline-none'
+        className='h-20 w-full resize-none border-b border-b-neutral-700 bg-transparent px-2 py-2 text-neutral-200 outline-hidden'
         defaultValue={state.payload}
         id='textareaPost'
         name='postText'
@@ -157,7 +157,7 @@ export default function FormCreatePost({ session }: { session: boolean }) {
             <img alt={file?.name} className='max-h-full w-auto' src={uploadedImageUrl} />
 
             <button
-              className='animate-fadeIn absolute left-1 top-1 rounded-full border-2 border-[#a50f0f] bg-[#26262690] p-1 transition-opacity duration-100 ease-linear hover:opacity-80 sm:p-1.5'
+              className='animate-fadeIn absolute top-1 left-1 rounded-full border-2 border-[#a50f0f] bg-[#26262690] p-1 transition-opacity duration-100 ease-linear hover:opacity-80 sm:p-1.5'
               type='button'
               onClick={() => {
                 setFile(null)

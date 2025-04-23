@@ -36,7 +36,7 @@ export default async function Aside() {
     : null
 
   return (
-    <aside className='sticky left-0 top-12 z-10 hidden border-r border-r-neutral-800 sm:flex sm:h-[calc(100vh-3rem)] sm:flex-col sm:justify-between'>
+    <aside className='sticky top-12 left-0 z-10 hidden border-r border-r-neutral-800 sm:flex sm:h-[calc(100vh-3rem)] sm:flex-col sm:justify-between'>
       {session?.user ? (
         <>
           <ul className='flex h-fit flex-col items-center gap-4 lg:items-start'>
@@ -44,7 +44,7 @@ export default async function Aside() {
               <li key={value.id} className='flex w-full items-center justify-center'>
                 <NavLink
                   activeClassName='[&>svg]:text-[#00b4f1] [&>p]:text-neutral-200 [&>p]:font-semibold'
-                  className='flex w-fit rounded-md p-2 text-neutral-300 hover:bg-[#3d3d3d90] lg:w-full lg:justify-start lg:gap-4 lg:pl-1'
+                  className='flex w-fit rounded-md p-2 text-neutral-300 hover:bg-neutral-700 lg:w-full lg:justify-start lg:gap-4 lg:pl-1'
                   href={value.href}
                   match={
                     value.text === 'Profile'
@@ -66,8 +66,8 @@ export default async function Aside() {
           </ul>
 
           <footer className='relative flex h-fit w-full items-center justify-center lg:justify-start'>
-            <details className='lg:w-full [&>summary]:open:bg-neutral-700' name='toggleLogout'>
-              <summary className='cursor-pointer list-none rounded-md px-1 py-1.5 transition-colors duration-100 ease-linear hover:bg-[#3d3d3d90] lg:flex lg:items-center lg:justify-between lg:gap-2'>
+            <details className='lg:w-full open:[&>summary]:bg-neutral-700' name='toggleLogout'>
+              <summary className='cursor-pointer list-none rounded-md px-1 py-1.5 transition-colors duration-100 ease-linear hover:bg-neutral-700 lg:flex lg:items-center lg:justify-between lg:gap-2'>
                 <img
                   alt={session.user.name!}
                   className='h-10 w-10 rounded-md lg:h-10 lg:w-10'

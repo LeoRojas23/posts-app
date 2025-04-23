@@ -31,7 +31,7 @@ export default function FormCreateReply({
       <textarea
         autoComplete='off'
         className={cn(
-          'w-full resize-none rounded-md border border-neutral-800 bg-transparent px-1 py-2 text-sm text-neutral-200 outline-none transition-colors duration-100 ease-linear sm:text-base',
+          'w-full resize-none rounded-md border border-neutral-800 bg-transparent px-1 py-2 text-sm text-neutral-200 outline-hidden transition-colors duration-100 ease-linear sm:text-base',
           {
             'ml-1': fromPostView,
             'border-neutral-500': pending,

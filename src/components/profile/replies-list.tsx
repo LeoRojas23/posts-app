@@ -21,7 +21,7 @@ export default function RepliesList({ comments, path, authorUsername, postId }: 
         const commentDate = timeAgo(comment.createdAt)
 
         return (
-          <section key={comment.id} className='flex [&>a>div]:last:hidden'>
+          <section key={comment.id} className='flex last:[&>a>div]:hidden'>
             <Link
               className='flex flex-col items-center justify-start px-1.5'
               href={`/profile/${comment.author.username}`}
@@ -40,7 +40,7 @@ export default function RepliesList({ comments, path, authorUsername, postId }: 
                   className='flex flex-wrap items-center gap-1.5'
                   href={`/profile/${comment.author.username}`}
                 >
-                  <h2 className='truncate text-[15px] font-bold leading-[21px] text-neutral-200 underline-offset-[3px] hover:underline'>
+                  <h2 className='truncate text-[15px] leading-[21px] font-bold text-neutral-200 underline-offset-[3px] hover:underline'>
                     {comment.author.name}
                   </h2>
                   <h3 className='truncate text-sm text-neutral-400 underline-offset-[3px] hover:underline'>
@@ -65,7 +65,7 @@ export default function RepliesList({ comments, path, authorUsername, postId }: 
                   href={`/post/${authorUsername}/${postId}`}
                 >
                   <div>
-                    <p className='w-full whitespace-break-spaces break-all text-neutral-200'>
+                    <p className='w-full break-all whitespace-break-spaces text-neutral-200'>
                       {comment.text}
                     </p>
                     <FooterReplyWrapper commentId={comment.id} />
