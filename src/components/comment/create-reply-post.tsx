@@ -53,7 +53,7 @@ export default function CreateReplyPost({ postId, commentsLength }: Props) {
 
   return (
     <details
-      className='flex w-full flex-col justify-center [&>summary>svg]:open:text-[#00b4f1]'
+      className='flex w-full flex-col justify-center open:[&>summary>svg]:text-[#00b4f1]'
       name='postDetails'
     >
       <summary className='group/reply-svg-post mx-auto flex w-fit cursor-pointer list-none items-center justify-start gap-1.5 py-1.5'>
@@ -61,7 +61,7 @@ export default function CreateReplyPost({ postId, commentsLength }: Props) {
           className='h-6 w-6 text-neutral-200 transition-colors duration-100 ease-linear sm:group-hover/reply-svg-post:text-[#00b4f1]'
           id='commentIcon'
         />
-        <span className='text-sm font-light tabular-nums text-neutral-200 sm:text-base'>
+        <span className='text-sm font-light text-neutral-200 tabular-nums sm:text-base'>
           {optimisticCommentsLength}
         </span>
       </summary>

@@ -163,7 +163,7 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
             />
 
             <button
-              className='animate-fadeIn absolute left-1 top-1 rounded-full border-2 border-[#a50f0f] bg-[#26262690] p-1 transition-opacity duration-100 ease-linear hover:opacity-80 sm:p-1.5'
+              className='animate-fadeIn absolute top-1 left-1 rounded-full border-2 border-[#a50f0f] bg-[#26262690] p-1 transition-opacity duration-100 ease-linear hover:opacity-80 sm:p-1.5'
               type='button'
               onClick={() => {
                 setFile(null)
@@ -184,7 +184,7 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
           </label>
           <input
             autoComplete='off'
-            className='w-full rounded-lg border border-neutral-600 bg-neutral-900 py-1 pl-1 text-[15px] text-neutral-200 placeholder-neutral-400 outline-none transition-colors duration-100 ease-linear focus:border-neutral-400'
+            className='w-full rounded-lg border border-neutral-600 bg-neutral-900 py-1 pl-1 text-[15px] text-neutral-200 placeholder-neutral-400 outline-hidden transition-colors duration-100 ease-linear focus:border-neutral-400'
             defaultValue={state.payload?.name}
             id='inputName'
             name='name'
@@ -203,7 +203,7 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
             </span>
             <input
               autoComplete='off'
-              className='w-full rounded-lg border border-neutral-600 bg-neutral-900 py-1 pl-[18px] text-[15px] text-neutral-200 placeholder-neutral-400 outline-none transition-colors duration-100 ease-linear focus:border-neutral-400'
+              className='w-full rounded-lg border border-neutral-600 bg-neutral-900 py-1 pl-[18px] text-[15px] text-neutral-200 placeholder-neutral-400 outline-hidden transition-colors duration-100 ease-linear focus:border-neutral-400'
               defaultValue={state.payload?.username}
               id='inputUsername'
               name='username'

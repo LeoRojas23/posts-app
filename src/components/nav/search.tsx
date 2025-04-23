@@ -46,13 +46,13 @@ export default function Search() {
         <label className='sr-only' htmlFor='searchInput'>
           Search posts or users
         </label>
-        <button className='absolute right-0 top-2 pr-1 sm:top-2' type='submit'>
+        <button className='absolute top-2 right-0 pr-1 sm:top-2' type='submit'>
           <Icon className='h-5 w-5 text-neutral-300' id='searchIcon' />
         </button>
         <input
           autoComplete='off'
           className={cn(
-            'h-9 w-full rounded-md border border-neutral-800 bg-transparent pl-1 pr-[26px] text-sm text-neutral-300 placeholder-neutral-400 outline-none transition-colors duration-100 ease-linear sm:w-64 sm:pr-7',
+            'h-9 w-full rounded-md border border-neutral-800 bg-transparent pr-[26px] pl-1 text-sm text-neutral-300 placeholder-neutral-400 outline-hidden transition-colors duration-100 ease-linear sm:w-64 sm:pr-7',
             {
               'border-[#00b4f1]': pathname === '/search',
               'focus:border-neutral-600': pathname !== '/search',
