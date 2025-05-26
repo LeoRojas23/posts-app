@@ -33,7 +33,7 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
 
   const ref = useRef<HTMLFormElement | null>(null)
 
-  const [state, formAction, pending] = useActionState(
+  const [state, formAction, formActionPending] = useActionState(
     async (status: UpdateSettingsResponse, formData: FormData) => {
       const name = (formData.get('name') as string) || undefined
       const username = (formData.get('username') as string) || undefined
@@ -47,6 +47,7 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
       }
 
       setFile(null)
+      ref.current?.reset()
       setUploadedImageUrl(null)
       setCurrentStep(STEPS_IMAGE_UPLOAD.READY)
 
@@ -90,7 +91,7 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
       action={formAction}
       className='flex h-full w-full max-w-xl flex-col items-start justify-between'
     >
-      <section className='mt-1 flex h-full w-full items-start justify-center'>
+      <section className={cn('mt-1 flex h-[480px] w-full items-start justify-center', {})}>
         {!file && currentStep === STEPS_IMAGE_UPLOAD.READY && (
           <label
             className='flex h-64 w-full max-w-md cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-neutral-600 bg-neutral-900 transition-colors duration-100 ease-linear hover:border-neutral-400'
@@ -116,44 +117,7 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
           </label>
         )}
         {file && currentStep === STEPS_IMAGE_UPLOAD.CROP ? (
-          <ImageCropper
-            file={file}
-            from='profile'
-            onApply={async blob => {
-              const formData = new FormData()
-              const croppedFile = new File([blob], file.name || 'cropped-image', {
-                type: blob.type,
-              })
-
-              formData.append('profileImage', croppedFile)
-              formData.append('from', 'profile')
-
-              try {
-                const response = await fetch('/api/file', {
-                  method: 'POST',
-                  body: formData,
-                })
-
-                const result = await response.json()
-
-                if (!response.ok || !result.url) {
-                  throw new Error(result?.error)
-                }
-
-                setUploadedImageUrl(result.url)
-                setCurrentStep(STEPS_IMAGE_UPLOAD.COMPLETED)
-              } catch (error) {
-                if (error instanceof Error) {
-                  toast.error(error.message)
-                }
-              }
-            }}
-            onClose={() => {
-              setFile(null)
-              setUploadedImageUrl(null)
-              setCurrentStep(STEPS_IMAGE_UPLOAD.READY)
-            }}
-          />
+          <ImageCropper file={file} from='profile' onApply={() => {}} onClose={() => {}} />
         ) : uploadedImageUrl && currentStep === STEPS_IMAGE_UPLOAD.COMPLETED ? (
           <div className='relative flex h-full w-full items-start justify-center'>
             <img
@@ -221,7 +185,7 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
             },
           )}
           disabled={currentStep === STEPS_IMAGE_UPLOAD.CROP}
-          pending={pending}
+          pending={formActionPending}
         >
           Save
         </SubmitFormButton>
