@@ -23,13 +23,14 @@ const initialState: CreatePostResponse = {
 export default function FormCreatePost({ session }: { session: boolean }) {
   const [file, setFile] = useState<FileWithPreview | null>(null)
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null)
+
   const [currentStep, setCurrentStep] = useState<
     (typeof STEPS_IMAGE_UPLOAD)[keyof typeof STEPS_IMAGE_UPLOAD]
   >(STEPS_IMAGE_UPLOAD.READY)
 
   const ref = useRef<HTMLFormElement | null>(null)
 
-  const [state, formAction, pending] = useActionState(
+  const [state, formAction, formActionPending] = useActionState(
     async (status: CreatePostResponse, formData: FormData) => {
       const text = (formData.get('postText') as string) || undefined
 
@@ -108,56 +109,16 @@ export default function FormCreatePost({ session }: { session: boolean }) {
       />
       <section
         className={cn({
-          'px-2 pb-1.5': file,
+          'h-[480px] w-full px-2 pb-1.5': file,
         })}
       >
         {file && currentStep === STEPS_IMAGE_UPLOAD.CROP ? (
-          <ImageCropper
-            file={file}
-            from='post'
-            onApply={async blob => {
-              const formData = new FormData()
-              const croppedFile = new File([blob], file.name || 'cropped-image', {
-                type: blob.type,
-              })
-
-              formData.append('postImage', croppedFile)
-              formData.append('from', 'post')
-
-              try {
-                const response = await fetch('/api/file', {
-                  method: 'POST',
-                  body: formData,
-                })
-
-                const result = await response.json()
-
-                if (!response.ok || !result.url) {
-                  throw new Error(
-                    result?.error || 'Image upload failed. Try again or reload the page.',
-                  )
-                }
-
-                setUploadedImageUrl(result.url)
-                setCurrentStep(STEPS_IMAGE_UPLOAD.COMPLETED)
-              } catch (error) {
-                if (error instanceof Error) {
-                  toast.error(error.message)
-                }
-              }
-            }}
-            onClose={() => {
-              setFile(null)
-              setUploadedImageUrl(null)
-              setCurrentStep(STEPS_IMAGE_UPLOAD.READY)
-            }}
-          />
+          <ImageCropper file={file} from='post' onApply={() => {}} onClose={() => {}} />
         ) : uploadedImageUrl && currentStep === STEPS_IMAGE_UPLOAD.COMPLETED ? (
-          <div className='relative flex h-[480px] w-full items-center justify-center'>
-            <img alt={file?.name} className='max-h-full w-auto' src={uploadedImageUrl} />
-
+          <div className='relative mx-auto flex h-fit w-full items-center justify-center'>
+            <img alt={file?.name} className='h-full w-auto' src={uploadedImageUrl} />
             <button
-              className='animate-fadeIn absolute top-1 left-1 rounded-full border-2 border-[#a50f0f] bg-[#26262690] p-1 transition-opacity duration-100 ease-linear hover:opacity-80 sm:p-1.5'
+              className='animate-fadeIn absolute top-1 left-1 cursor-pointer rounded-full border-2 border-[#a50f0f] bg-[#26262690] p-1 transition-opacity duration-100 ease-linear hover:opacity-80 sm:p-1.5'
               type='button'
               onClick={() => {
                 setFile(null)
@@ -172,7 +133,7 @@ export default function FormCreatePost({ session }: { session: boolean }) {
       </section>
       <section className='flex h-fit items-center justify-between px-1 pb-1.5'>
         <input
-          accept='.jpeg,.jpg,.png,.webp,.avif'
+          accept='.jpeg, .jpg, .png, .webp, .avif'
           className='sr-only'
           disabled={!session || currentStep === STEPS_IMAGE_UPLOAD.COMPLETED}
           id='postInputFile'
@@ -202,7 +163,7 @@ export default function FormCreatePost({ session }: { session: boolean }) {
             },
           )}
           disabled={currentStep === STEPS_IMAGE_UPLOAD.CROP}
-          pending={pending}
+          pending={formActionPending}
         >
           Send
         </SubmitFormButton>
