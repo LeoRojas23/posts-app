@@ -14,21 +14,22 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   pending: boolean
 }
 
-export default function SubmitFormButton({
+export default function FormButton({
   children,
   className,
   disableDots = false,
   fromToggleFollow = false,
   pending,
+  type = 'submit',
   ...props
 }: Props) {
   return (
     <button
-      className={cn('grid place-items-center', className, {
+      className={cn('grid cursor-pointer place-items-center', className, {
         'place-items-start': disableDots,
       })}
       disabled={!fromToggleFollow && pending}
-      type='submit'
+      type={type === 'button' ? 'button' : 'submit'}
       {...props}
     >
       <span
