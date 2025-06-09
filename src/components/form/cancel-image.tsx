@@ -21,6 +21,7 @@ export default function CancelImage({ onClick }: Props) {
   return (
     <FormButton
       className='absolute top-1 left-1 cursor-pointer rounded-full bg-[#a50f0f] p-1 transition-opacity duration-100 ease-linear hover:opacity-80 sm:p-1.5'
+      dotsColor='bg-[#fff1f1]'
       formAction={formAction}
       pending={formActionPending}
       type='submit'
