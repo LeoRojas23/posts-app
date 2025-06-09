@@ -1,14 +1,15 @@
 'use client'
 
-import { useActionState, useRef, useState } from 'react'
+import { useActionState, useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
 import ImageCropper from './image-cropper'
+import CancelImage from './cancel-image'
 
-import { updateSettings } from '@/actions/actions'
+import { processImage, updateSettings, uploadImageToCloudinary } from '@/actions/actions'
 import { UpdateSettingsResponse, type FileWithPreview } from '@/types'
-import SubmitFormButton from '@/components/button/submit-form-button'
+import FormButton from '@/components/button/form-button'
 import Icon from '@/components/icon'
 import { STEPS_IMAGE_UPLOAD } from '@/utils/utils'
 import { ImageSchema } from '@/validations/image'
@@ -25,8 +26,11 @@ const initialState: UpdateSettingsResponse = {
 }
 
 export default function FormUpdateSettings({ sessionName, sessionUsername }: Props) {
+  const [isPending, startTransition] = useTransition()
+
   const [file, setFile] = useState<FileWithPreview | null>(null)
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null)
+
   const [currentStep, setCurrentStep] = useState<
     (typeof STEPS_IMAGE_UPLOAD)[keyof typeof STEPS_IMAGE_UPLOAD]
   >(STEPS_IMAGE_UPLOAD.READY)
@@ -84,6 +88,11 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
       }
     }
   }
+  const clearStates = () => {
+    setFile(null)
+    setUploadedImageUrl(null)
+    setCurrentStep(STEPS_IMAGE_UPLOAD.READY)
+  }
 
   return (
     <form
@@ -91,7 +100,12 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
       action={formAction}
       className='flex h-full w-full max-w-xl flex-col items-start justify-between'
     >
-      <section className={cn('mt-1 flex h-[480px] w-full items-start justify-center', {})}>
+      <section
+        className={cn('mt-1 flex h-[480px] w-full items-start justify-center', {
+          'animate-pulse opacity-30 transition-opacity [&>div>button]:hidden [&>div>div>div]:data-testid:hidden':
+            file && isPending,
+        })}
+      >
         {!file && currentStep === STEPS_IMAGE_UPLOAD.READY && (
           <label
             className='flex h-64 w-full max-w-md cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-neutral-600 bg-neutral-900 transition-colors duration-100 ease-linear hover:border-neutral-400'
@@ -107,7 +121,7 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
               </p>
             </div>
             <input
-              accept='.jpeg,.jpg,.png,.webp,.avif'
+              accept='.jpeg, .jpg, .png, .webp, .avif'
               aria-label='Update your profile image'
               className='sr-only'
               id='fileInputZone'
@@ -117,26 +131,35 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
           </label>
         )}
         {file && currentStep === STEPS_IMAGE_UPLOAD.CROP ? (
-          <ImageCropper file={file} from='profile' onApply={() => {}} onClose={() => {}} />
+          <ImageCropper
+            clearStates={clearStates}
+            file={file}
+            from='profile'
+            onApply={async (blobUrl: string) => {
+              startTransition(async () => {
+                const imageProcessed = await processImage({
+                  url: blobUrl,
+                  mime: file.type,
+                  from: 'profile',
+                })
+                const result = await uploadImageToCloudinary(imageProcessed)
+
+                startTransition(() => {
+                  setCurrentStep(STEPS_IMAGE_UPLOAD.COMPLETED)
+                  setUploadedImageUrl(result.url)
+                })
+              })
+            }}
+          />
         ) : uploadedImageUrl && currentStep === STEPS_IMAGE_UPLOAD.COMPLETED ? (
           <div className='relative flex h-full w-full items-start justify-center'>
             <img
               alt={file?.name}
-              className='max-h-full w-auto rounded-md border-2 border-neutral-800'
+              className='rounded-md border-2 border-neutral-800'
               src={uploadedImageUrl}
             />
 
-            <button
-              className='animate-fadeIn absolute top-1 left-1 rounded-full border-2 border-[#a50f0f] bg-[#26262690] p-1 transition-opacity duration-100 ease-linear hover:opacity-80 sm:p-1.5'
-              type='button'
-              onClick={() => {
-                setFile(null)
-                setUploadedImageUrl(null)
-                setCurrentStep(STEPS_IMAGE_UPLOAD.READY)
-              }}
-            >
-              <Icon className='h-5 w-5 text-[#fff1f1]' id='close' />
-            </button>
+            <CancelImage onClick={clearStates} />
           </div>
         ) : null}
       </section>
@@ -177,7 +200,7 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
           </div>
         </div>
 
-        <SubmitFormButton
+        <FormButton
           className={cn(
             'mx-auto my-2 w-fit rounded-md bg-[#00b4f1] px-2 py-1 font-bold text-[#0d0d0d] transition-opacity duration-100 ease-linear hover:opacity-90 sm:px-3 sm:py-1.5',
             {
@@ -188,7 +211,7 @@ export default function FormUpdateSettings({ sessionName, sessionUsername }: Pro
           pending={formActionPending}
         >
           Save
-        </SubmitFormButton>
+        </FormButton>
       </footer>
     </form>
   )

@@ -1,17 +1,18 @@
 'use client'
 
-import { useActionState, useRef, useState } from 'react'
+import { useActionState, useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
 import Icon from '../icon'
-import SubmitFormButton from '../button/submit-form-button'
+import FormButton from '../button/form-button'
 
 import ImageCropper from './image-cropper'
+import CancelImage from './cancel-image'
 
 import { type CreatePostResponse, type FileWithPreview } from '@/types'
 import { cn } from '@/utils/cn'
-import { createPost } from '@/actions/actions'
+import { createPost, processImage, uploadImageToCloudinary } from '@/actions/actions'
 import { STEPS_IMAGE_UPLOAD } from '@/utils/utils'
 import { ImageSchema } from '@/validations/image'
 
@@ -21,6 +22,8 @@ const initialState: CreatePostResponse = {
 }
 
 export default function FormCreatePost({ session }: { session: boolean }) {
+  const [isPending, startTransition] = useTransition()
+
   const [file, setFile] = useState<FileWithPreview | null>(null)
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null)
 
@@ -81,6 +84,12 @@ export default function FormCreatePost({ session }: { session: boolean }) {
     }
   }
 
+  const clearStates = () => {
+    setFile(null)
+    setUploadedImageUrl(null)
+    setCurrentStep(STEPS_IMAGE_UPLOAD.READY)
+  }
+
   return (
     <form
       ref={ref}
@@ -110,24 +119,35 @@ export default function FormCreatePost({ session }: { session: boolean }) {
       <section
         className={cn({
           'h-[480px] w-full px-2 pb-1.5': file,
+          'animate-pulse opacity-30 transition-opacity [&>div>button]:hidden [&>div>div>div]:data-testid:hidden':
+            file && isPending,
         })}
       >
         {file && currentStep === STEPS_IMAGE_UPLOAD.CROP ? (
-          <ImageCropper file={file} from='post' onApply={() => {}} onClose={() => {}} />
+          <ImageCropper
+            clearStates={clearStates}
+            file={file}
+            from='post'
+            onApply={async (blobUrl: string) => {
+              startTransition(async () => {
+                const imageProcessed = await processImage({
+                  url: blobUrl,
+                  mime: file.type,
+                  from: 'post',
+                })
+                const result = await uploadImageToCloudinary(imageProcessed)
+
+                startTransition(() => {
+                  setCurrentStep(STEPS_IMAGE_UPLOAD.COMPLETED)
+                  setUploadedImageUrl(result.url)
+                })
+              })
+            }}
+          />
         ) : uploadedImageUrl && currentStep === STEPS_IMAGE_UPLOAD.COMPLETED ? (
-          <div className='relative mx-auto flex h-fit w-full items-center justify-center'>
-            <img alt={file?.name} className='h-full w-auto' src={uploadedImageUrl} />
-            <button
-              className='animate-fadeIn absolute top-1 left-1 cursor-pointer rounded-full border-2 border-[#a50f0f] bg-[#26262690] p-1 transition-opacity duration-100 ease-linear hover:opacity-80 sm:p-1.5'
-              type='button'
-              onClick={() => {
-                setFile(null)
-                setUploadedImageUrl(null)
-                setCurrentStep(STEPS_IMAGE_UPLOAD.READY)
-              }}
-            >
-              <Icon className='h-5 w-5 text-[#fff1f1]' id='close' />
-            </button>
+          <div className='relative flex h-full w-full items-center justify-center'>
+            <img alt={file?.name} src={uploadedImageUrl} />
+            <CancelImage onClick={clearStates} />
           </div>
         ) : null}
       </section>
@@ -155,7 +175,7 @@ export default function FormCreatePost({ session }: { session: boolean }) {
           <span className='sr-only'>Upload an image</span>
         </label>
 
-        <SubmitFormButton
+        <FormButton
           className={cn(
             'rounded-md bg-[#00b4f1] px-2 py-1 font-bold text-[#0d0d0d] transition-opacity duration-100 ease-linear hover:opacity-80 sm:px-3 sm:py-1.5',
             {
@@ -166,7 +186,7 @@ export default function FormCreatePost({ session }: { session: boolean }) {
           pending={formActionPending}
         >
           Send
-        </SubmitFormButton>
+        </FormButton>
       </section>
     </form>
   )
