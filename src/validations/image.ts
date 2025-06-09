@@ -7,8 +7,8 @@ export const ImageSchema = z
   .refine(file => file === undefined || ACCEPTED_IMAGE_TYPES.includes(file.type), {
     message: 'Supported image formats are .jpeg, .jpg, .png, .webp, or .avif',
   })
-  .refine(file => file === undefined || file.size <= 1024 * 1024 * 4.3, {
-    message: 'The image size should not exceed 4,5 MB',
+  .refine(file => file === undefined || file.size <= 15 * 1024 * 1024, {
+    message: 'The image size should not exceed 15MB',
   })
   .refine(
     file =>

@@ -12,23 +12,26 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   disableDots?: boolean
   fromToggleFollow?: boolean
   pending: boolean
+  dotsColor?: string
 }
 
-export default function SubmitFormButton({
+export default function FormButton({
   children,
   className,
   disableDots = false,
   fromToggleFollow = false,
   pending,
+  type = 'submit',
+  dotsColor = 'bg-neutral-800',
   ...props
 }: Props) {
   return (
     <button
-      className={cn('grid place-items-center', className, {
+      className={cn('grid cursor-pointer place-items-center', className, {
         'place-items-start': disableDots,
       })}
       disabled={!fromToggleFollow && pending}
-      type='submit'
+      type={type === 'button' ? 'button' : 'submit'}
       {...props}
     >
       <span
@@ -44,7 +47,7 @@ export default function SubmitFormButton({
             'pointer-events-none opacity-0': !disableDots && !pending,
           })}
         >
-          <Dots />
+          <Dots bgColor={dotsColor} />
         </span>
       )}
     </button>

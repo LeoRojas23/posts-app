@@ -5,10 +5,11 @@ import { redirect } from 'next/navigation'
 import { v2 as cloudinary } from 'cloudinary'
 import { and, eq } from 'drizzle-orm'
 import { unstable_expireTag as expireTag } from 'next/cache'
-import { headers } from 'next/headers'
+import { cookies, headers } from 'next/headers'
+import sharp from 'sharp'
+import { del } from '@vercel/blob'
 
 import { db } from '@/db'
-import { resizeImage } from '@/utils/resize-images'
 import {
   commentLikeTable,
   commentTable,
@@ -36,14 +37,14 @@ const cloudinaryConfig = cloudinary.config({
   secure: true,
 })
 
-export async function uploadImageToCloudinary(fileUri: string | undefined) {
-  if (!fileUri) return undefined
-
+export async function uploadImageToCloudinary(dataUri: string) {
   try {
-    const uploadResult = await cloudinary.uploader.upload(fileUri, {
+    const uploadResult = await cloudinary.uploader.upload(dataUri, {
       transformation: [{ radius: 6 }],
       invalidate: true,
     })
+
+    ;(await cookies()).set('image-url-cld', uploadResult.url, { httpOnly: true })
 
     return uploadResult
   } catch {
@@ -63,6 +64,36 @@ async function deleteCloudinaryImage(imageUrl: string | null) {
       throw new Error(`Failed to delete image from cloudinary`)
     }
   }
+}
+
+export async function processImage({
+  url,
+  mime,
+  from,
+}: {
+  url: string
+  mime: string | undefined
+  from: 'post' | 'profile'
+}) {
+  ;(await cookies()).set('blob-image-url', url, {
+    httpOnly: true,
+  })
+
+  const fileBuffer = await fetch(url).then(res => res.arrayBuffer())
+
+  const imageBuffer = await sharp(fileBuffer)
+    .resize({
+      withoutEnlargement: true,
+      width: from === 'post' ? 740 : 300,
+      height: from === 'post' ? 480 : 300,
+      fit: 'inside',
+    })
+    .webp({ lossless: false, quality: 90 })
+    .toBuffer()
+
+  const base64Image = Buffer.from(imageBuffer).toString('base64')
+
+  return 'data:' + mime + ';' + 'base64' + ',' + base64Image
 }
 
 export async function getSignature() {
@@ -126,11 +157,19 @@ export const createPost = async ({
     }
   }
 
-  await db.insert(postTable).values({
-    authorId: user.session.userId,
-    text: result.data.text,
-    image: image ?? null,
-  })
+  const cookieStore = await cookies()
+  const imageUrl = cookieStore.get('blob-image-url')?.value
+
+  Promise.all([
+    db.insert(postTable).values({
+      authorId: user.session.userId,
+      text: result.data.text,
+      image: image ?? null,
+    }),
+    cookieStore.delete('image-url-cld'),
+    cookieStore.delete('blob-image-url'),
+    imageUrl ? del(imageUrl) : Promise.resolve(),
+  ])
 
   expireTag('root-posts', 'user-posts', 'media-posts', 'search-posts')
 
@@ -405,6 +444,19 @@ export const toggleFollow = async ({ userToFollow }: { userToFollow: string }) =
   expireTag('follows-promise', 'follows-count')
 }
 
+export const clearImageData = async () => {
+  const cookieStore = await cookies()
+  const blobUrl = cookieStore.get('blob-image-url')!.value
+  const imageUrl = cookieStore.get('image-url-cld')!.value
+
+  await Promise.all([
+    del(blobUrl),
+    deleteCloudinaryImage(imageUrl),
+    cookieStore.delete('image-url-cld'),
+    cookieStore.delete('blob-image-url'),
+  ])
+}
+
 export const updateSettings = async ({
   name,
   username,
@@ -483,18 +535,21 @@ export const updateSettings = async ({
 
   const newImage = image ?? imageProfile
 
-  await db
-    .update(userTable)
-    .set({
-      image: newImage,
-      name: result.data.name,
-      username: result.data.username,
-    })
-    .where(eq(userTable.id, user.session.userId))
+  const cookieStore = await cookies()
 
-  if (image && imageProfile) {
-    await deleteCloudinaryImage(imageProfile)
-  }
+  await Promise.all([
+    db
+      .update(userTable)
+      .set({
+        image: newImage,
+        name: result.data.name,
+        username: result.data.username,
+      })
+      .where(eq(userTable.id, user.session.userId)),
+    cookieStore.delete('blob-image-url'),
+    cookieStore.delete('image-url-cld'),
+    image && imageProfile ? deleteCloudinaryImage(imageProfile) : Promise.resolve(),
+  ])
 
   const redirectUsername = result.data.username ?? user.user.username
 

@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react'
 
-import SubmitFormButton from './submit-form-button'
+import FormButton from './form-button'
 
 import { manageAuth } from '@/actions/actions'
 
@@ -20,9 +20,9 @@ export default function AuthButton({ className, children, action, provider }: Pr
 
   return (
     <form action={formAction}>
-      <SubmitFormButton className={className} pending={pending}>
+      <FormButton className={className} pending={pending}>
         {children}
-      </SubmitFormButton>
+      </FormButton>
     </form>
   )
 }

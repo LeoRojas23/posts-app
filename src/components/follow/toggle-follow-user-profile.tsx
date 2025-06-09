@@ -3,7 +3,7 @@
 import { useActionState } from 'react'
 import { toast } from 'sonner'
 
-import SubmitFormButton from '../button/submit-form-button'
+import FormButton from '../button/form-button'
 
 import { useFollow } from './follow-context'
 
@@ -54,14 +54,14 @@ export default function ToggleFollowUserProfile({ userToFollow, sessionUserId }:
         </p>
       </section>
       <form action={formAction}>
-        <SubmitFormButton
+        <FormButton
           disableDots
           fromToggleFollow
           className='rounded-md bg-[#00b4f1] px-2 py-1 font-bold text-[#0d0d0d] transition-opacity duration-100 ease-linear hover:opacity-90 sm:px-2.5 sm:py-1.5'
           pending={pending}
         >
           {isFollowing ? 'Unfollow user' : 'Follow user'}
-        </SubmitFormButton>
+        </FormButton>
       </form>
     </section>
   )
