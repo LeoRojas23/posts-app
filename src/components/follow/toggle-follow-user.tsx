@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { useActionState } from 'react'
 
 import Icon from '../icon'
-import SubmitFormButton from '../button/submit-form-button'
+import FormButton from '../button/form-button'
 
 import { useFollow } from './follow-context'
 
@@ -42,7 +42,7 @@ export default function ToggleFollowUser({ userToFollow, sessionUserId, showIcon
 
   return (
     <form action={formAction} className='flex w-full items-center justify-end'>
-      <SubmitFormButton
+      <FormButton
         disableDots
         fromToggleFollow
         className={cn({
@@ -59,7 +59,7 @@ export default function ToggleFollowUser({ userToFollow, sessionUserId, showIcon
           ) : null}
           {isFollowing ? 'Unfollow user' : 'Follow user'}
         </div>
-      </SubmitFormButton>
+      </FormButton>
     </form>
   )
 }
