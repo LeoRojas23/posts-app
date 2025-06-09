@@ -12,6 +12,7 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   disableDots?: boolean
   fromToggleFollow?: boolean
   pending: boolean
+  dotsColor?: string
 }
 
 export default function FormButton({
@@ -21,6 +22,7 @@ export default function FormButton({
   fromToggleFollow = false,
   pending,
   type = 'submit',
+  dotsColor = 'bg-neutral-800',
   ...props
 }: Props) {
   return (
@@ -45,7 +47,7 @@ export default function FormButton({
             'pointer-events-none opacity-0': !disableDots && !pending,
           })}
         >
-          <Dots />
+          <Dots bgColor={dotsColor} />
         </span>
       )}
     </button>
