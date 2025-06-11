@@ -19,7 +19,7 @@ importers:
         specifier: 1.3.1
         version: 1.3.1(next@15.4.0-canary.2(@babel/core@7.26.10)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
       '@vercel/blob':
-        specifier: ^1.1.1
+        specifier: 1.1.1
         version: 1.1.1
       better-auth:
         specifier: 1.1.10
@@ -55,7 +55,7 @@ importers:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
       react-easy-crop:
-        specifier: ^5.4.1
+        specifier: 5.4.1
         version: 5.4.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react-image-crop:
         specifier: 11.0.7
@@ -64,7 +64,7 @@ importers:
         specifier: 0.33.5
         version: 0.33.5
       sonner:
-        specifier: ^2.0.3
+        specifier: 2.0.3
         version: 2.0.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       tailwind-merge:
         specifier: 2.5.2
@@ -80,7 +80,7 @@ importers:
         specifier: 15.4.0-canary.2
         version: 15.4.0-canary.2
       '@tailwindcss/postcss':
-        specifier: ^4.1.4
+        specifier: 4.1.4
         version: 4.1.4
       '@types/node':
         specifier: '20'
@@ -92,7 +92,7 @@ importers:
         specifier: 19.1.2
         version: 19.1.2(@types/react@19.1.2)
       '@vercel/style-guide':
-        specifier: ^6.0.0
+        specifier: 6.0.0
         version: 6.0.0(@next/eslint-plugin-next@15.4.0-canary.2)(eslint@9.9.0(jiti@2.4.2))(prettier@3.3.3)(typescript@5.7.3)
       drizzle-kit:
         specifier: 0.24.0
@@ -1941,10 +1941,6 @@ packages:
 
   emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
-
-  enhanced-resolve@5.18.0:
-    resolution: {integrity: sha512-0/r0MySGYG8YqlayBZ6MuCfECmHFdJ5qyPh8s8wa5Hnm6SaFLSK1VYCbj+NKp090Nm1caZhD+QTnmxO7esYGyQ==}
-    engines: {node: '>=10.13.0'}
 
   enhanced-resolve@5.18.1:
     resolution: {integrity: sha512-ZSW3ma5GkcQBIpwZTSRAI8N71Uuwgs93IezB7mf7R60tC8ZbJideoDNKjHn2O9KIlx6rkGTTEk1xUCK2E1Y2Yg==}
@@ -5317,11 +5313,6 @@ snapshots:
 
   emoji-regex@9.2.2: {}
 
-  enhanced-resolve@5.18.0:
-    dependencies:
-      graceful-fs: 4.2.11
-      tapable: 2.2.1
-
   enhanced-resolve@5.18.1:
     dependencies:
       graceful-fs: 4.2.11
@@ -5547,7 +5538,7 @@ snapshots:
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.0
-      enhanced-resolve: 5.18.0
+      enhanced-resolve: 5.18.1
       eslint: 9.9.0(jiti@2.4.2)
       fast-glob: 3.3.3
       get-tsconfig: 4.8.1
@@ -5563,7 +5554,7 @@ snapshots:
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.0
-      enhanced-resolve: 5.18.0
+      enhanced-resolve: 5.18.1
       eslint: 9.9.0(jiti@2.4.2)
       fast-glob: 3.3.3
       get-tsconfig: 4.8.1
